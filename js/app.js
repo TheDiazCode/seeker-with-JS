@@ -21,13 +21,13 @@ const datoBuscado = {
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-    ShowCars();
+    ShowCars(autos);
     CompleteYearSelect();
 });
 
 marca.addEventListener('change',e=>{
     datoBuscado.marca = e.target.value;
-    FiltrarAuto();
+    FiltrarAuto(autos);
 });
 year.addEventListener('change',e=>{
     datoBuscado.year = e.target.value;
@@ -35,21 +35,27 @@ year.addEventListener('change',e=>{
 });
 minimo.addEventListener('change',e=>{
     datoBuscado.minimo = e.target.value;
+    FiltrarAuto();
 });
 maximo.addEventListener('change',e=>{
     datoBuscado.maximo = e.target.value;
+    FiltrarAuto();
 });
 puertas.addEventListener('change',e=>{
     datoBuscado.puertas = e.target.value;
+    FiltrarAuto();
 });
 transmision.addEventListener('change',e=>{
     datoBuscado.transmision = e.target.value;
+    FiltrarAuto();
 });
 color.addEventListener('change',e=>{
     datoBuscado.color = e.target.value;
+    FiltrarAuto();
 });
 
-function ShowCars(){
+function ShowCars(autos){
+    LimpiarHTML();
     autos.forEach(auto => {
         const {marca,modelo,year,puertas,transmision,precio,color}=auto;
         const carHTML = document.createElement('p');
@@ -58,6 +64,12 @@ function ShowCars(){
         `;
         answer.appendChild(carHTML);
     });
+}
+
+function LimpiarHTML(){
+    while(answer.firstChild){
+        answer.removeChild(answer.firstChild);
+    }
 }
 
 function CompleteYearSelect(){
@@ -70,8 +82,16 @@ function CompleteYearSelect(){
 }
 
 function FiltrarAuto(){
-    const resultado = autos.filter(FiltrarMarca).filter(FiltrarYear);
-    console.log(resultado);
+    const resultado = autos.filter(FiltrarMarca).filter(FiltrarYear).filter(FiltrarMinimo).filter(FiltrarMaximo).filter(FiltrarPuertas).filter(FiltrarTransmision).filter(FiltrarColor);
+    if(resultado.length){
+        ShowCars(resultado);
+    }else{
+        LimpiarHTML();
+        const resp = document.createElement('div');
+        resp.classList.add('alerta','error');
+        resp.textContent = 'No se encontraron resultados';
+        resultado.appendChild(resp);
+    }
 }
 
 function FiltrarMarca(auto){
@@ -84,6 +104,41 @@ function FiltrarMarca(auto){
 function FiltrarYear(auto){
     if(datoBuscado.year){
         return auto.year === parseInt(datoBuscado.year);
+    }
+    return auto;
+}
+
+function FiltrarMinimo(auto){
+    if(datoBuscado.minimo){
+        return auto.precio >= parseInt(datoBuscado.minimo);
+    }
+    return auto;
+}
+
+function FiltrarMaximo(auto){
+    if(datoBuscado.maximo){
+        return auto.precio <= parseInt(datoBuscado.maximo);
+    }
+    return auto;
+}
+
+function FiltrarPuertas(auto){
+    if(datoBuscado.puertas){
+        return auto.puertas === parseInt(datoBuscado.puertas);
+    }
+    return auto;
+}
+
+function FiltrarTransmision(auto){
+    if(datoBuscado.transmision){
+        return auto.transmision === datoBuscado.transmision;
+    } 
+    return auto;
+}
+
+function FiltrarColor(auto){
+    if(datoBuscado.color){
+        return auto.color === datoBuscado.color;
     }
     return auto;
 }
